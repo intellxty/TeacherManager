@@ -1,0 +1,42 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "com.bdap.teachermanager",
+      "nativeLanguage": "zh-cn"
+    },
+    "jhipsterVersion": "6.5.0",
+    "applicationType": "monolith",
+    "baseName": "teachermanager",
+    "packageName": "com.bdap.teachermanager",
+    "packageFolder": "com/bdap/teachermanager",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": "spring-websocket",
+    "databaseType": "mongodb",
+    "devDatabaseType": "mongodb",
+    "prodDatabaseType": "mongodb",
+    "searchEngine": "elasticsearch",
+    "messageBroker": false,
+    "serviceDiscoveryType": "eureka",
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "Y2YzYWFiN2ZiZDRjYjgyOTBkOGZmODNkMTE3MGIwZWM5NDE2YmM3YjcwNWUyN2UxMGUyZjkzNzM0YzcxYzhhMzFhODU0ZWVhYTU4MzhkZTRiZjU4YWM4MjE2NDIwM2JkNmQ1M2Q0MThjMDZkNDMwNGZjZTE4NGE4YTYxYjdlMmQ=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "clientFramework": "react",
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "nativeLanguage": "zh-cn",
+    "languages": ["zh-cn"],
+    "blueprints": []
+  }
+}
