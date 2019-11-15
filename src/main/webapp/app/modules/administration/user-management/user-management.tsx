@@ -53,8 +53,14 @@ export const UserManagement = (props: IUserManagementProps) => {
     <div>
       <h2 id="user-management-page-heading">
         <Translate contentKey="userManagement.home.title">Users</Translate>
-        <Link to={`${match.url}/new`} className="btn btn-primary float-right jh-create-entity">
+        <Link to={`${match.url}/new/new1`} className="btn btn-primary float-right jh-create-entity">
           <FontAwesomeIcon icon="plus" /> <Translate contentKey="userManagement.home.createLabel">Create a new user</Translate>
+        </Link>
+        <Link to={`${match.url}/new/addDataFromFile`} className="btn btn-primary float-right jh-create-entity">
+          <FontAwesomeIcon icon="plus" /> 批量导入用户
+        </Link>
+        <Link to={`${match.url}/new/deleteAllUser`} className="btn btn-primary float-right jh-create-entity">
+          <FontAwesomeIcon icon="plus" /> 清空所有非管理员用户
         </Link>
       </h2>
       <Table responsive striped>
