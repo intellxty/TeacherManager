@@ -9,6 +9,7 @@ class Add extends React.Component{
         studentData:[],
         Modalvisible:false,
         fileType:"",
+        studentDataPreview:[],
     }
     uploadrequest=()=>
     {   
@@ -25,13 +26,26 @@ componentWillMount=async()=>
     this.setState({studentData:sdata})
     
 }
-onChangeUpLoadFile=(file)=>
+onChangeUpLoadFile=(item)=>
 {
-    console.log(file.response);
+    if(item.file.response!==undefined)
+    {
+        this.setState({studentDataPreview:item.file.response})
+    }
 }
 render(){
     const fileColumns=[{}];
     const fileData=[{}];
+    const studentPreviewColumn=[{
+        title: '登录名',
+        dataIndex: 'login',
+        key: 'login',
+      },
+      {
+        title: '权限',
+        dataIndex: 'authorities',
+        key: 'authorities',
+      },]
     const studentColumn=[{
         title: '登录名',
         dataIndex: 'login',
@@ -77,15 +91,16 @@ render(){
                 </Button>
             </Upload>
             <div style={{height:"80px"}}></div>
-            <Upload action="/addUserFromFile" onChange={this.onChangeUpLoadFile}>
+            <Upload accept=".csv" action="/addUserFromFile" onChange={this.onChangeUpLoadFile}>
                 <Button>
                 <Icon type="upload" /> 选择文件
                 </Button>
             </Upload>
             </Col>
             <Col span={14}>
-            <Row><h3>文件格式预览</h3></Row>
-            <Row><Table columns={[]} dataSource={[]}></Table></Row>
+            <Row><h3>文件数据预览</h3></Row>
+            <Row><h5>请务必检查文件格式符合[登录名，密码]形式！</h5></Row>
+            <Row><Table rowKey="id" columns={studentPreviewColumn} dataSource={this.state.studentDataPreview}></Table></Row>
             </Col>
             </Row>
            </Modal>
