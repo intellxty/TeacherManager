@@ -32,7 +32,6 @@ public class UserDTO {
     private String lastName;
 
     @Email
-    @Size(min = 5, max = 254)
     private String email;
 
     @Size(max = 256)
@@ -40,7 +39,6 @@ public class UserDTO {
 
     private boolean activated = false;
 
-    @Size(min = 2, max = 10)
     private String langKey;
 
     private String createdBy;
@@ -50,6 +48,8 @@ public class UserDTO {
     private String lastModifiedBy;
 
     private Instant lastModifiedDate;
+
+    private String passWord;
 
     private Set<String> authorities;
 
@@ -70,6 +70,7 @@ public class UserDTO {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
+        this.passWord=user.getPassword();
         this.authorities = user.getAuthorities().stream()
             .map(Authority::getName)
             .collect(Collectors.toSet());
@@ -146,6 +147,10 @@ public class UserDTO {
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
+    public String getPassWord() {
+        return passWord;
+    }
+    public void setPassWord (String passWord)  {this.passWord=passWord;}
 
     public Instant getCreatedDate() {
         return createdDate;

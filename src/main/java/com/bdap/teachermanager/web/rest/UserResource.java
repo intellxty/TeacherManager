@@ -1,6 +1,7 @@
 package com.bdap.teachermanager.web.rest;
 
 import com.bdap.teachermanager.config.Constants;
+import com.bdap.teachermanager.domain.Authority;
 import com.bdap.teachermanager.domain.User;
 import com.bdap.teachermanager.repository.UserRepository;
 import com.bdap.teachermanager.repository.search.UserSearchRepository;
@@ -26,9 +27,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -208,4 +216,6 @@ public class UserResource {
             .stream(userSearchRepository.search(queryStringQuery(query)).spliterator(), false)
             .collect(Collectors.toList());
     }
+
+
 }

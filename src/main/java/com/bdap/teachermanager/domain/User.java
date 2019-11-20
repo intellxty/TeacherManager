@@ -51,14 +51,13 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Field("last_name")
     private String lastName;
 
-    @Email
+    /*@Email
     @Size(min = 5, max = 254)
-    @Indexed
+    @Indexed*/
     private String email;
 
     private boolean activated = false;
 
-    @Size(min = 2, max = 10)
     @Field("lang_key")
     private String langKey;
 
