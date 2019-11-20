@@ -1,3 +1,4 @@
+
 node_modules/
 src/main/docker/
 src/test/javascript/protractor.conf.js

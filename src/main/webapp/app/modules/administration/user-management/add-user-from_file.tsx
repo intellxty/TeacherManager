@@ -1,8 +1,8 @@
 import React from 'react';
 import {Row,Col,Table,Button, Modal,Upload,Icon} from 'antd';
 import 'antd/dist/antd.css';
-import { getUsers, updateUser } from './user-management.reducer';
-import { async } from 'rxjs/internal/scheduler/async';
+import axios from "axios";
+
 class Add extends React.Component{
     state={
         studentColumns:[],
@@ -17,13 +17,37 @@ class Add extends React.Component{
             Modalvisible:!Modalvisible
         });
     }
-componentWillMount=async()=>(
-    this.setState({studentData:await getUsers()})
-)
+componentWillMount=async()=>
+{
+    const sdata=await axios.get("/api/users").then(response=>response.data).then(data=>data 
+        )
+    sdata.map(data=> {data.authorities=data.authorities.join(","); data});
+    this.setState({studentData:sdata})
+    
+}
+onChangeUpLoadFile=(file)=>
+{
+    console.log(file.response);
+}
 render(){
     const fileColumns=[{}];
     const fileData=[{}];
-    
+    const studentColumn=[{
+        title: '登录名',
+        dataIndex: 'login',
+        key: 'login',
+      },
+      {
+        title: '权限',
+        dataIndex: 'authorities',
+        key: 'authorities',
+      },
+      {
+        title: '创建时间',
+        dataIndex: 'createdDate',
+        key: 'createdDate',
+      },
+    ]
     return(
     <div>
      <Row>
@@ -53,7 +77,7 @@ render(){
                 </Button>
             </Upload>
             <div style={{height:"80px"}}></div>
-            <Upload action="/addUserFromFile">
+            <Upload action="/addUserFromFile" onChange={this.onChangeUpLoadFile}>
                 <Button>
                 <Icon type="upload" /> 选择文件
                 </Button>
@@ -69,13 +93,15 @@ render(){
          </Col>
             
          <Col span={12}>
-         <Table columns={[]} dataSource={[]}></Table>
+         <Table rowKey="id" columns={studentColumn} dataSource={this.state.studentData}></Table>
          </Col>
 
      </Row>
 
 
     </div>
+  
+    
 )
 }
 }

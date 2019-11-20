@@ -14,7 +14,7 @@ services:
       - SPRING_DATA_JEST_URI=http://teachermanager-elasticsearch:9200
       - SPRING_ELASTICSEARCH_REST_URIS=http://teachermanager-elasticsearch:9200
     ports:
-      - 8080:8080
+      - 7200:7200
   teachermanager-mongodb:
     extends:
       file: mongodb.yml
