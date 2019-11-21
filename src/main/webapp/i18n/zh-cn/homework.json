@@ -1,0 +1,26 @@
+{
+  "teachermanagerApp": {
+    "homework": {
+      "home": {
+        "title": "Homework",
+        "createLabel": "创建新 Homework",
+        "createOrEditLabel": "创建或编辑 Homework",
+        "search": "查找 Homework",
+        "notFound": "No Homework found"
+      },
+      "created": "Homework {{ param }} 创建成功",
+      "updated": "Homework {{ param }} 更新成功",
+      "deleted": "Homework {{ param }} 删除成功",
+      "delete": {
+        "question": "你确定要删除 Homework {{ id }} 吗？"
+      },
+      "detail": {
+        "title": "Homework"
+      },
+      "fileName": "File Name",
+      "owner": "Owner",
+      "className": "Class Name",
+      "editTime": "Edit Time"
+    }
+  }
+}
