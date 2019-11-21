@@ -102,6 +102,13 @@ public class HomeworkResource {
         Page<Homework> page = homeworkService.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+
+    }
+    @GetMapping("/homework/student/{id}")
+    public ResponseEntity<List<Homework>> getStudentHomework(@PathVariable String id) {
+        log.debug("REST request to get a page of Homework");
+        List<Homework> homework = homeworkService.findByOwner(id);
+        return ResponseEntity.ok().body(homework);
     }
 
     /**
@@ -110,12 +117,12 @@ public class HomeworkResource {
      * @param id the id of the homework to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the homework, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/homework/{id}")
+    /*@GetMapping("/homework/{id}")
     public ResponseEntity<Homework> getHomework(@PathVariable String id) {
         log.debug("REST request to get Homework : {}", id);
         Optional<Homework> homework = homeworkService.findOne(id);
         return ResponseUtil.wrapOrNotFound(homework);
-    }
+    }*/
 
     /**
      * {@code DELETE  /homework/:id} : delete the "id" homework.

@@ -10,6 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.jws.Oneway;
+import java.util.List;
 import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -54,7 +56,11 @@ public class HomeworkService {
         log.debug("Request to get all Homework");
         return homeworkRepository.findAll(pageable);
     }
-
+    public List<Homework> findByOwner(String Owner)
+    {
+        log.debug("Request to get one student's Homework");
+        return homeworkRepository.findByOwner(Owner);
+    }
 
     /**
      * Get one homework by id.

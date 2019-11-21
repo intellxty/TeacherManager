@@ -2,26 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, InputGroup, Col, Row, Table } from 'reactstrap';
-import { AvForm, AvGroup, AvInput } from 'availity-reactstrap-validation';
 import {
   Translate,
-  translate,
-  ICrudSearchAction,
-  ICrudGetAllAction,
   TextFormat,
-  getSortState,
   IPaginationBaseState,
-  JhiPagination,
-  JhiItemCount
+
 } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { IRootState } from 'app/shared/reducers';
 import { getSearchEntities, getEntities } from './homework.reducer';
-import { IHomework } from 'app/shared/model/homework.model';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
-import { ITEMS_PER_PAGE } from 'app/shared/util/pagination.constants';
 import Axios from 'axios';
+
 
 export interface IHomeworkProps extends StateProps, DispatchProps, RouteComponentProps<{ url: string }> {}
 
@@ -29,29 +22,54 @@ export interface IHomeworkState extends IPaginationBaseState {
   search: string;
 }
 
-export class Homework extends React.Component<IHomeworkProps, IHomeworkState> {
- 
-
-  render() {
-   const homeworkList=[
+export class Homework extends React.Component<IHomeworkProps>{
+  state={
+    userInfo:null,
+    homeworkList:[],
+    isadmin:false,
+  }
+  
+  componentWillMount()
+  {
+    Axios.get('/api/account')
+    .then(response=>{
+      this.setState({userInfo:response.data,isadmin:response.data.authorities.indexOf("ROLE_ADMIN")!==-1})
+    if(!this.state.isadmin)
+      {
+      Axios.get(`/api/homework/student/${this.state.userInfo.login}`)
+      .then(res=>{
+        this.setState({homeworkList:res.data})
+      })
+      }
+    else
     {
-        "id": "5dd5149de5134bd0e487197e",
-        "fileName": "ddd.txt",
-        "owner": null,
-        "className": null,
-        "editTime": null
+      Axios.get(`/api/homework/`)
+      .then(res=>{
+        this.setState({homeworkList:res.data})
+      })
     }
-]
-   
+    })
+    
+  }
+ 
+  render() {
+   const {homeworkList}=this.state;
+   const {match}=this.props;
     return (
+      
       <div>
         <h2 id="homework-heading">
           <Translate contentKey="teachermanagerApp.homework.home.title">Homework</Translate>
-          <Link to={`ddd/new`} className="btn btn-primary float-right jh-create-entity" id="jh-create-entity">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="teachermanagerApp.homework.home.createLabel">Create a new Homework</Translate>
+          {
+          this.state.isadmin?
+      
+          <Link to={`${match.url}/check`} className="btn btn-primary float-right jh-create-entity" id="jh-create-entity">
+            查看作业完成情况
           </Link>
+          :
+          <Button  className="btn btn-primary float-right jh-create-entity">上传作业</Button>
+          }
+
         </h2>
         
         <div className="table-responsive">
@@ -81,7 +99,7 @@ export class Homework extends React.Component<IHomeworkProps, IHomeworkState> {
                 {homeworkList.map((homework, i) => (
                   <tr key={`entity-${i}`}>
                     <td>
-                      <Button tag={Link} to={`ddd/${homework.id}`} color="link" size="sm">
+                      <Button tag={Link} to={`${match.url}/${homework.id}`} color="link" size="sm">
                         {homework.id}
                       </Button>
                     </td>
@@ -93,19 +111,19 @@ export class Homework extends React.Component<IHomeworkProps, IHomeworkState> {
                     </td>
                     <td className="text-right">
                       <div className="btn-group flex-btn-group-container">
-                        <Button tag={Link} to={`ddd/${homework.id}`} color="info" size="sm">
+                        <Button tag={Link} to={`${match.url}/${homework.id}`} color="info" size="sm">
                           <FontAwesomeIcon icon="eye" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.view">View</Translate>
                           </span>
                         </Button>
-                        <Button tag={Link} to={`ddd/${homework.id}/edit`} color="primary" size="sm">
+                        <Button tag={Link} to={`${match.url}/${homework.id}/edit`} color="primary" size="sm">
                           <FontAwesomeIcon icon="pencil-alt" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.edit">Edit</Translate>
                           </span>
                         </Button>
-                        <Button tag={Link} to={`ddd/${homework.id}/delete`} color="danger" size="sm">
+                        <Button tag={Link} to={`${match.url}/${homework.id}/delete`} color="danger" size="sm">
                           <FontAwesomeIcon icon="trash" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.delete">Delete</Translate>
