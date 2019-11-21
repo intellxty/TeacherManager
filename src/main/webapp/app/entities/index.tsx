@@ -5,6 +5,7 @@ import { Switch } from 'react-router-dom';
 import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 
 import Homework from './homework';
+import Publicfiles from './publicfiles'
 /* jhipster-needle-add-route-import - JHipster will add routes here */
 
 const Routes = ({ match }) => (
@@ -12,6 +13,7 @@ const Routes = ({ match }) => (
     <Switch>
       {/* prettier-ignore */}
       <ErrorBoundaryRoute path={`${match.url}homework`} component={Homework} />
+      <ErrorBoundaryRoute path={`${match.url}publicfiles`} component={Publicfiles} />
       {/* jhipster-needle-add-route-path - JHipster will add routes here */}
     </Switch>
   </div>
