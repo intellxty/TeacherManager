@@ -35,8 +35,19 @@ public class Homework implements Serializable {
 
     @NotNull
     @Field("edit_time")
-    private ZonedDateTime editTime;
+    private String editTime;
 
+   public  Homework(String fileName,String owner,String className,String editTime)
+   {
+       this.setFileName(fileName);
+       this.setOwner(owner);
+       this.setClassName(className);
+       this.setEditTime(editTime);
+   }
+   public Homework()
+   {
+
+   }
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
         return id;
@@ -85,16 +96,16 @@ public class Homework implements Serializable {
         this.className = className;
     }
 
-    public ZonedDateTime getEditTime() {
+    public String getEditTime() {
         return editTime;
     }
 
-    public Homework editTime(ZonedDateTime editTime) {
+    public Homework editTime(String editTime) {
         this.editTime = editTime;
         return this;
     }
 
-    public void setEditTime(ZonedDateTime editTime) {
+    public void setEditTime(String editTime) {
         this.editTime = editTime;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

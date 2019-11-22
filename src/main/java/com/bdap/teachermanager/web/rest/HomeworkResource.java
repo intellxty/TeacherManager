@@ -1,32 +1,38 @@
 package com.bdap.teachermanager.web.rest;
 
+import com.bdap.teachermanager.config.FtpConfiguration;
 import com.bdap.teachermanager.domain.Homework;
+import com.bdap.teachermanager.service.FtpService;
 import com.bdap.teachermanager.service.HomeworkService;
 import com.bdap.teachermanager.web.rest.errors.BadRequestAlertException;
 
+import com.jcraft.jsch.ChannelSftp;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.StreamSupport;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * REST controller for managing {@link com.bdap.teachermanager.domain.Homework}.
@@ -44,6 +50,13 @@ public class HomeworkResource {
 
     private final HomeworkService homeworkService;
 
+    @Autowired
+    FtpService ftpService;
+
+    FtpConfiguration ftpConfiguration=new FtpConfiguration();
+
+    ChannelSftp sftp=ftpConfiguration.sftp;
+
     public HomeworkResource(HomeworkService homeworkService) {
         this.homeworkService = homeworkService;
     }
@@ -55,13 +68,18 @@ public class HomeworkResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new homework, or with status {@code 400 (Bad Request)} if the homework has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+    //上传作业时将作业信息写入数据库
     @PostMapping("/homework")
-    public ResponseEntity<Homework> createHomework(@Valid @RequestBody Homework homework) throws URISyntaxException {
+    public ResponseEntity<Homework> createHomework(@RequestParam("owner") String owner ,@RequestParam("className") String className , @RequestParam("file") MultipartFile file) throws Exception {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Homework homework=new Homework(file.getOriginalFilename(),owner,className, df.format(new Date()));
         log.debug("REST request to save Homework : {}", homework);
         if (homework.getId() != null) {
             throw new BadRequestAlertException("A new homework cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Homework result = homeworkService.save(homework);
+
+        ftpService.uploadFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+homework.getClassName()+"/"+homework.getOwner()+"/"+homework.getFileName(),file);
         return ResponseEntity.created(new URI("/api/homework/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
@@ -76,6 +94,7 @@ public class HomeworkResource {
      * or with status {@code 500 (Internal Server Error)} if the homework couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
+
     @PutMapping("/homework")
     public ResponseEntity<Homework> updateHomework(@Valid @RequestBody Homework homework) throws URISyntaxException {
         log.debug("REST request to update Homework : {}", homework);

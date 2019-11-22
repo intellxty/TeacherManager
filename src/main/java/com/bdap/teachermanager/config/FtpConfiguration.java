@@ -1,11 +1,23 @@
 package com.bdap.teachermanager.config;
 
 import com.bdap.teachermanager.web.rest.HomeworkResource;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPReply;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.ChannelSftp.LsEntry;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+
 
 import java.io.IOException;
 
@@ -13,43 +25,68 @@ import java.io.IOException;
  * @Author XingTianYu
  * @date 2019/11/21 18:53
  */
+@Data
+@AllArgsConstructor
 public class FtpConfiguration {
+    private static final Logger LOG = LoggerFactory.getLogger(FtpConfiguration.class);
     private String userName="tseg";
     private String password="tseg";
-    private String ftpUrl="10.105.222.90:22";
-    private String DefaultPath="/home/tseg/teachermanager";
-    public FTPClient client=this.connectFtpServer();
-    public FtpConfiguration()throws IOException
-    {
-      this.client=connectFtpServer();
+    private String ftpUrl="10.105.222.90";
+    private int ftpPort=22;
+    public String DefaultPath="/home/tseg/teachermanager";
+    public String homeWorkDir="/homework";
+    public String pubicFilesDir="/publicfiles";
+    public ChannelSftp sftp;
+    public FtpConfiguration() {
+        this.sftp=getsftp(ftpUrl,ftpPort,userName,password,DefaultPath);
     }
-    public FTPClient connectFtpServer()throws IOException
-
-    {
-        final Logger log = LoggerFactory.getLogger(HomeworkResource.class);
-        FTPClient ftpClient = new FTPClient();
-        ftpClient.setConnectTimeout(1000*30);//设置连接超时时间
-        ftpClient.setControlEncoding("utf-8");//设置ftp字符集
-        ftpClient.enterLocalPassiveMode();
-        //设置被动模式，文件传输端口设置
+    private static ChannelSftp getsftp(String host, int port, String username, final String password, String dir) {
+        List<String> list = new ArrayList<String>();
+        ChannelSftp sftp = null;
+        Channel channel = null;
+        Session sshSession = null;
         try {
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-            //设置文件传输模式为二进制，可以保证传输的内容不会被改变
-            ftpClient.connect(this.ftpUrl);
-            ftpClient.login(userName,password);
-            int replyCode = ftpClient.getReplyCode();
-            if (!FTPReply.isPositiveCompletion(replyCode)){
-                log.error("connect ftp {} failed",this.ftpUrl);
-                ftpClient.disconnect();
-                return null;
-            }
-            log.info("replyCode==========={}",replyCode);
-        } catch (IOException e) {
-            log.error("connect fail ------->>>{}",e.getCause());
-            return null;
+            JSch jsch = new JSch();
+            jsch.getSession(username, host, port);
+            sshSession = jsch.getSession(username, host, port);
+            sshSession.setPassword(password);
+            Properties sshConfig = new Properties();
+            sshConfig.put("StrictHostKeyChecking", "no");
+            sshSession.setConfig(sshConfig);
+            sshSession.connect();
+            LOG.debug("Session connected!");
+            channel = sshSession.openChannel("sftp");
+            channel.connect();
+            LOG.debug("Channel connected!");
+           sftp = (ChannelSftp) channel;
+            /*Vector<?> vector = sftp.ls(dir);
+            for (Object item:vector) {
+                LsEntry entry = (LsEntry) item;
+                System.out.println(entry.getFilename());
+            }*/
+            return sftp;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return ftpClient;
+        return null;
     }
+
+    private static void closeChannel(Channel channel) {
+        if (channel != null) {
+            if (channel.isConnected()) {
+                channel.disconnect();
+            }
+        }
+    }
+
+    private static void closeSession(Session session) {
+        if (session != null) {
+            if (session.isConnected()) {
+                session.disconnect();
+            }
+        }
+    }
+
     public String formPath(String absPath)
     {
         return this.DefaultPath+absPath;

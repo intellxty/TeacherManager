@@ -53,8 +53,8 @@ public class HomeworkResourceIT {
     private static final String DEFAULT_CLASS_NAME = "AAAAAAAAAA";
     private static final String UPDATED_CLASS_NAME = "BBBBBBBBBB";
 
-    private static final ZonedDateTime DEFAULT_EDIT_TIME = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
-    private static final ZonedDateTime UPDATED_EDIT_TIME = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
+    private static final String DEFAULT_EDIT_TIME = "AAAAAAAAAA";
+    private static final String UPDATED_EDIT_TIME = "BBBBBBBBBB";
 
     @Autowired
     private HomeworkRepository homeworkRepository;
@@ -259,9 +259,9 @@ public class HomeworkResourceIT {
             .andExpect(jsonPath("$.[*].fileName").value(hasItem(DEFAULT_FILE_NAME)))
             .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER)))
             .andExpect(jsonPath("$.[*].className").value(hasItem(DEFAULT_CLASS_NAME)))
-            .andExpect(jsonPath("$.[*].editTime").value(hasItem(sameInstant(DEFAULT_EDIT_TIME))));
+            .andExpect(jsonPath("$.[*].editTime").value(hasItem(DEFAULT_EDIT_TIME)));
     }
-    
+
     @Test
     public void getHomework() throws Exception {
         // Initialize the database
@@ -275,7 +275,7 @@ public class HomeworkResourceIT {
             .andExpect(jsonPath("$.fileName").value(DEFAULT_FILE_NAME))
             .andExpect(jsonPath("$.owner").value(DEFAULT_OWNER))
             .andExpect(jsonPath("$.className").value(DEFAULT_CLASS_NAME))
-            .andExpect(jsonPath("$.editTime").value(sameInstant(DEFAULT_EDIT_TIME)));
+            .andExpect(jsonPath("$.editTime").value(DEFAULT_EDIT_TIME));
     }
 
     @Test
@@ -374,6 +374,6 @@ public class HomeworkResourceIT {
             .andExpect(jsonPath("$.[*].fileName").value(hasItem(DEFAULT_FILE_NAME)))
             .andExpect(jsonPath("$.[*].owner").value(hasItem(DEFAULT_OWNER)))
             .andExpect(jsonPath("$.[*].className").value(hasItem(DEFAULT_CLASS_NAME)))
-            .andExpect(jsonPath("$.[*].editTime").value(hasItem(sameInstant(DEFAULT_EDIT_TIME))));
+            .andExpect(jsonPath("$.[*].editTime").value(hasItem(DEFAULT_EDIT_TIME)));
     }
 }
