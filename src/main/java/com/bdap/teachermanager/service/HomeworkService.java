@@ -101,6 +101,9 @@ public class HomeworkService {
        List<Homework> result= homeworkRepository.findByOwnerAndFileName(homework.getOwner(),homework.getFileName());
         return result.size()!=0?result.get(0):null;
     }
-
+    public List<Homework> findByKeywordAndClassName(String keyword,String className)
+    {
+        return homeworkRepository.findByClassNameAndFileNameLike(className,keyword);
+    }
 
 }

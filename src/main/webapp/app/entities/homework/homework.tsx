@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { Button, InputGroup, Col, Row, Table } from 'reactstrap';
+import {Icon} from 'antd'
 import {
   Translate,
   TextFormat,
@@ -112,16 +113,11 @@ export class Homework extends React.Component<IHomeworkProps>{
                     <td className="text-right">
                       <div className="btn-group flex-btn-group-container">
                         <Button tag={Link} to={`${match.url}/${homework.id}`} color="info" size="sm">
-                          <FontAwesomeIcon icon="eye" />{' '}
+                          <Icon type="download" style={{fontSize:18}}/>{' '}
                           <span className="d-none d-md-inline">
-                            <Translate contentKey="entity.action.view">View</Translate>
+                           下载
                           </span>
-                        </Button>
-                        <Button tag={Link} to={`${match.url}/${homework.id}/edit`} color="primary" size="sm">
-                          <FontAwesomeIcon icon="pencil-alt" />{' '}
-                          <span className="d-none d-md-inline">
-                            <Translate contentKey="entity.action.edit">Edit</Translate>
-                          </span>
+
                         </Button>
                         <Button tag={Link} to={`${match.url}/${homework.id}/delete`} color="danger" size="sm">
                           <FontAwesomeIcon icon="trash" />{' '}

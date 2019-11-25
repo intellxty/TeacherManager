@@ -2,6 +2,8 @@ package com.bdap.teachermanager.web.rest;
 
 import com.bdap.teachermanager.config.FtpConfiguration;
 import com.bdap.teachermanager.domain.Homework;
+import com.bdap.teachermanager.domain.User;
+import com.bdap.teachermanager.repository.UserRepository;
 import com.bdap.teachermanager.service.FtpService;
 import com.bdap.teachermanager.service.HomeworkService;
 import com.bdap.teachermanager.web.rest.errors.BadRequestAlertException;
@@ -9,7 +11,6 @@ import com.bdap.teachermanager.web.rest.errors.BadRequestAlertException;
 import com.jcraft.jsch.ChannelSftp;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,24 +19,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -53,6 +49,8 @@ public class HomeworkResource {
     private String applicationName;
 
     private final HomeworkService homeworkService;
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     FtpService ftpService;
@@ -200,4 +198,24 @@ public class HomeworkResource {
         }
         else {return null;}
     }
+    @GetMapping("/homework/select")
+    Object findHomeworkByKey(@RequestParam("keyword") String keyword ,@RequestParam("className") String className)
+    {
+        List<Homework> homeworkList=homeworkService.findByKeywordAndClassName(keyword,className);
+        List<User> userList=userRepository.findByClassName(className);
+        Map<String,String> checkMap= new HashMap<>();
+        for(int i=0;i<userList.size();i++)
+        {
+            checkMap.put(userList.get(i).getLogin(),"否");
+        }
+        for(int i=0;i<homeworkList.size();i++)
+        {
+            if(checkMap.containsKey(homeworkList.get(i).getOwner()))
+            {
+                checkMap.put(homeworkList.get(i).getOwner(),"是");
+            }
+        }
+        return ResponseEntity.ok().body(checkMap);
+    }
+
 }
