@@ -14,4 +14,6 @@ import java.util.List;
 @Repository
 public interface HomeworkRepository extends MongoRepository<Homework, String> {
     List<Homework> findByOwner(String owner);
+    List<Homework> findByOwnerAndFileName(String owner, String fileName);
+    void deleteByOwnerAndFileName(String owner, String fileName);
 }

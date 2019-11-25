@@ -76,12 +76,12 @@ public class HomeworkService {
     /**
      * Delete the homework by id.
      *
-     * @param id the id of the entity.
+     *
      */
-    public void delete(String id) {
-        log.debug("Request to delete Homework : {}", id);
-        homeworkRepository.deleteById(id);
-        homeworkSearchRepository.deleteById(id);
+    public void delete(String fileName,String owner,String className) {
+        log.debug("Request to delete Homework : {}", fileName);
+        homeworkRepository.deleteByOwnerAndFileName(owner,fileName);
+        homeworkSearchRepository.deleteByOwnerAndFileName(owner,fileName);
     }
 
     /**
@@ -93,5 +93,14 @@ public class HomeworkService {
      */
     public Page<Homework> search(String query, Pageable pageable) {
         log.debug("Request to search for a page of Homework for query {}", query);
-        return homeworkSearchRepository.search(queryStringQuery(query), pageable);    }
+        return homeworkSearchRepository.search(queryStringQuery(query), pageable);
+    }
+
+        public Homework checkExistByFileNameAndOwner(Homework homework)
+    {
+       List<Homework> result= homeworkRepository.findByOwnerAndFileName(homework.getOwner(),homework.getFileName());
+        return result.size()!=0?result.get(0):null;
+    }
+
+
 }

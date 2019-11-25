@@ -10,6 +10,7 @@ import com.jcraft.jsch.ChannelSftp;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -26,9 +28,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +81,10 @@ public class HomeworkResource {
         if (homework.getId() != null) {
             throw new BadRequestAlertException("A new homework cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        Homework update=homeworkService.checkExistByFileNameAndOwner(homework);
+        if(update!=null){
+
+        }
         Homework result = homeworkService.save(homework);
 
         ftpService.uploadFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+homework.getClassName()+"/"+homework.getOwner()+"/"+homework.getFileName(),file);
@@ -88,7 +96,7 @@ public class HomeworkResource {
     /**
      * {@code PUT  /homework} : Updates an existing homework.
      *
-     * @param homework the homework to update.
+     *
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated homework,
      * or with status {@code 400 (Bad Request)} if the homework is not valid,
      * or with status {@code 500 (Internal Server Error)} if the homework couldn't be updated.
@@ -96,13 +104,20 @@ public class HomeworkResource {
      */
 
     @PutMapping("/homework")
-    public ResponseEntity<Homework> updateHomework(@Valid @RequestBody Homework homework) throws URISyntaxException {
+    public ResponseEntity<Homework> updateHomework(@RequestParam("owner") String owner ,@RequestParam("className") String className , @RequestParam("file") MultipartFile file) throws Exception {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+       Homework homework=new Homework(file.getOriginalFilename(),owner,className, df.format(new Date()));
         log.debug("REST request to update Homework : {}", homework);
-        if (homework.getId() == null) {
+        /*if (homework.getOwner() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        Homework result = homeworkService.save(homework);
-        return ResponseEntity.ok()
+        }*/
+         Homework update=homeworkService.checkExistByFileNameAndOwner(homework);
+         if(update!=null) {
+             homework.setId(update.getId());
+         }
+         Homework result = homeworkService.save(homework);
+        ftpService.uploadFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+homework.getClassName()+"/"+homework.getOwner()+"/"+homework.getFileName(),file);
+         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, homework.getId().toString()))
             .body(result);
     }
@@ -123,10 +138,10 @@ public class HomeworkResource {
         return ResponseEntity.ok().headers(headers).body(page.getContent());
 
     }
-    @GetMapping("/homework/student/{id}")
-    public ResponseEntity<List<Homework>> getStudentHomework(@PathVariable String id) {
+    @GetMapping("/homework/student/{owner}")
+    public ResponseEntity<List<Homework>> getStudentHomework(@PathVariable String owner) {
         log.debug("REST request to get a page of Homework");
-        List<Homework> homework = homeworkService.findByOwner(id);
+        List<Homework> homework = homeworkService.findByOwner(owner);
         return ResponseEntity.ok().body(homework);
     }
 
@@ -146,14 +161,15 @@ public class HomeworkResource {
     /**
      * {@code DELETE  /homework/:id} : delete the "id" homework.
      *
-     * @param id the id of the homework to delete.
+     *
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/homework/{id}")
-    public ResponseEntity<Void> deleteHomework(@PathVariable String id) {
-        log.debug("REST request to delete Homework : {}", id);
-        homeworkService.delete(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id)).build();
+    @DeleteMapping("/homework")
+    public ResponseEntity<Void> deleteHomework(@RequestParam("owner") String owner ,@RequestParam("className") String className,@RequestParam("fileName") String fileName)throws  Exception
+    { ;
+        homeworkService.delete(fileName,owner,className);
+        ftpService.deleteFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+className+"/"+owner+"/"+fileName);
+        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, owner)).build();
     }
 
     /**
@@ -170,5 +186,18 @@ public class HomeworkResource {
         Page<Homework> page = homeworkService.search(query, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
+    }
+    @GetMapping("/homework/download")
+    Object downloadHomework(@RequestParam("owner") String owner ,@RequestParam("className") String className,@RequestParam("fileName") String fileName)throws Exception
+    {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName,"UTF-8"));
+        InputStream stream=ftpService.downloadFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+className+"/"+owner+"/"+fileName);
+        if(stream!=null) {
+            byte[] body = IOUtils.toByteArray(stream);
+            return ResponseEntity.ok().headers(httpHeaders)
+                .contentType(MediaType.parseMediaType("application/octet-stream")).body(body);
+        }
+        else {return null;}
     }
 }
