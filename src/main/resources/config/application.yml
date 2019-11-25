@@ -95,6 +95,10 @@ spring:
   mvc:
     favicon:
       enabled: false
+  servlet:
+    multipart:
+      maxFileSize: '1000MB'
+      maxRequestSize: '10000MB'
   task:
     execution:
       thread-name-prefix: teachermanager-task-

@@ -46,6 +46,10 @@ public class FtpResource  {
     @GetMapping("/public")
     ResponseEntity<List<Publicfiles>> getStudentHomeWork() throws Exception
     {
+        if(!sftp.isConnected()){
+            ftpConfiguration=new FtpConfiguration();
+            sftp=ftpConfiguration.sftp;
+        }
         List<Publicfiles> publicFilesList=new ArrayList();
         Vector<?> vector = sftp.ls(ftpConfiguration.DefaultPath+ftpConfiguration.pubicFilesDir);
         for (Object item:vector) {
@@ -59,6 +63,10 @@ public class FtpResource  {
     @PutMapping("/public")
     ResponseEntity<Void> uploadPublicFiles(HttpServletRequest request)throws Exception
     {
+        if(!sftp.isConnected()){
+            ftpConfiguration=new FtpConfiguration();
+            sftp=ftpConfiguration.sftp;
+        }
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         MultipartFile file = multipartRequest.getFile("file");
         return (ftpService.uploadFiles(sftp,ftpConfiguration.DefaultPath +ftpConfiguration.pubicFilesDir +"/"+file.getOriginalFilename(),file))?new ResponseEntity<>(HttpStatus.OK):new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -78,9 +86,24 @@ public class FtpResource  {
         else {return null;}
     }
     @DeleteMapping("/public")
-    Object deletePublicFiles( @RequestParam String fileName)throws Exception
+    Object deletePublicFiles( @RequestParam("fileName") String fileName)throws Exception
     {
         return ftpService.deleteFiles(sftp,ftpConfiguration.DefaultPath + ftpConfiguration.pubicFilesDir+"/"+fileName)?new ResponseEntity<>(HttpStatus.OK):new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @GetMapping("/public/download")
+    Object downloadPublic(@RequestParam("fileName") String fileName)throws Exception
+    {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName,"UTF-8"));
+        InputStream stream=ftpService.downloadFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.pubicFilesDir+"/"+fileName);
+        if(stream!=null) {
+            byte[] body = IOUtils.toByteArray(stream);
+            return ResponseEntity.ok().headers(httpHeaders)
+                .contentType(MediaType.parseMediaType("application/octet-stream")).body(body);
+
+        }
+
+        else {return null;}
     }
 }
 
