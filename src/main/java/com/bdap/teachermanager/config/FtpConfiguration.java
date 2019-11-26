@@ -40,6 +40,23 @@ public class FtpConfiguration {
     public FtpConfiguration() {
         this.sftp=getsftp(ftpUrl,ftpPort,userName,password,DefaultPath);
     }
+    public  Channel getsshchannel()
+    {
+        Session sshSession = null;
+        try {
+        JSch jsch = new JSch();
+        sshSession = jsch.getSession(userName, ftpUrl, ftpPort);
+        sshSession.setPassword(password);
+        Properties sshConfig = new Properties();
+        sshConfig.put("StrictHostKeyChecking", "no");
+        sshSession.setConfig(sshConfig);
+        sshSession.connect();
+        return sshSession.openChannel("exec");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     private static ChannelSftp getsftp(String host, int port, String username, final String password, String dir) {
         List<String> list = new ArrayList<String>();
         ChannelSftp sftp = null;

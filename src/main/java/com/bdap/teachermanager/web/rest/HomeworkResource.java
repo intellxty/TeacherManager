@@ -7,10 +7,10 @@ import com.bdap.teachermanager.repository.UserRepository;
 import com.bdap.teachermanager.service.FtpService;
 import com.bdap.teachermanager.service.HomeworkService;
 import com.bdap.teachermanager.web.rest.errors.BadRequestAlertException;
-
-import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.*;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
+import javassist.bytecode.ByteArray;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +25,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 /**
@@ -66,7 +68,7 @@ public class HomeworkResource {
     /**
      * {@code POST  /homework} : Create a new homework.
      *
-     * @param homework the homework to create.
+     *
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new homework, or with status {@code 400 (Bad Request)} if the homework has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
@@ -216,6 +218,32 @@ public class HomeworkResource {
             }
         }
         return ResponseEntity.ok().body(checkMap);
+    }
+    @GetMapping("/homework/downloadzip")
+    Object downloadzip(@RequestParam("keyword") String keyword ,@RequestParam("className") String className) throws Exception
+    {
+        List<Homework> homeworkList=homeworkService.findByKeywordAndClassName(keyword,className);
+        File zipFile=new File(this.getClass().getResource("").getPath()+className+".zip");
+        ftpService.packToZip(homeworkList,zipFile,ftpConfiguration,sftp);
+
+        InputStream result=new FileInputStream(zipFile);
+        if(result!=null) {
+            byte[] body = IOUtils.toByteArray(result);
+            result.close();
+            zipFile.delete();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("Content-Disposition", "attachment;filename=" + URLEncoder.encode(className, "UTF-8")+".zip");
+            return ResponseEntity.ok()
+                .headers(httpHeaders).contentType(MediaType.parseMediaType("application/octet-stream")).body(body);
+
+        }
+
+
+        else {
+            return ResponseEntity.badRequest();
+        }
+
+
     }
 
 }

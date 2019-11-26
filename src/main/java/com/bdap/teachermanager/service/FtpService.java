@@ -1,6 +1,7 @@
 package com.bdap.teachermanager.service;
 
 import com.bdap.teachermanager.config.FtpConfiguration;
+import com.bdap.teachermanager.domain.Homework;
 import com.bdap.teachermanager.web.rest.HomeworkResource;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
@@ -13,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
+import java.io.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * @Author XingTianYu
@@ -85,4 +88,33 @@ public class FtpService {
         return false;
     }
 
+    public void packToZip(List<Homework> homeworkList,File zipFile,FtpConfiguration ftpConfiguration,ChannelSftp sftp) throws IOException,SftpException
+    {
+
+        BufferedInputStream bis = null;
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+        fos = new FileOutputStream(zipFile);
+        zos = new ZipOutputStream(new BufferedOutputStream(fos));
+        byte[] bufs = new byte[1024 * 10];
+        // 创建ZIP实体，并添加进压缩包
+        for(int i=0;i<homeworkList.size();i++) {
+            String filePath=ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+homeworkList.get(i).getClassName()+"/"+homeworkList.get(i).getOwner()+"/"+homeworkList.get(i).getFileName();
+            InputStream file=sftp.get(filePath);
+            ZipEntry zipEntry = new ZipEntry(homeworkList.get(i).getOwner()+"-"+homeworkList.get(i).getFileName());
+            zos.putNextEntry(zipEntry);
+            // 读取待压缩的文件并写进压缩包里
+            bis = new BufferedInputStream(file);
+            int read = 0;
+            int count = 0;
+            while ((read = bis.read(bufs, 0, 1024 * 10)) != -1) {
+                zos.write(bufs, count * read, read);
+            }
+            file.close();
+            bis.close();
+        }
+        zos.close();
+        fos.close();
+
+    }
 }
