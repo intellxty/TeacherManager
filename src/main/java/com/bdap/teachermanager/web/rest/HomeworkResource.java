@@ -2,6 +2,7 @@ package com.bdap.teachermanager.web.rest;
 
 import com.bdap.teachermanager.config.FtpConfiguration;
 import com.bdap.teachermanager.domain.Homework;
+import com.bdap.teachermanager.domain.HomeworkCheck;
 import com.bdap.teachermanager.domain.User;
 import com.bdap.teachermanager.repository.UserRepository;
 import com.bdap.teachermanager.service.FtpService;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
@@ -131,6 +133,7 @@ public class HomeworkResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of homework in body.
      */
     @GetMapping("/homework")
+    @PreAuthorize("hasRole(\"ROLE_ADMIN\")")
     public ResponseEntity<List<Homework>> getAllHomework(Pageable pageable) {
         log.debug("REST request to get a page of Homework");
         Page<Homework> page = homeworkService.findAll(pageable);
@@ -165,11 +168,12 @@ public class HomeworkResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/homework")
+    @PreAuthorize("hasRole(\"ROLE_ADMIN\")")
     public ResponseEntity<Void> deleteHomework(@RequestParam("owner") String owner ,@RequestParam("className") String className,@RequestParam("fileName") String fileName)throws  Exception
     { ;
         homeworkService.delete(fileName,owner,className);
         ftpService.deleteFiles(sftp,ftpConfiguration.DefaultPath+ftpConfiguration.homeWorkDir+"/"+className+"/"+owner+"/"+fileName);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, owner)).build();
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, owner)).build();
     }
 
     /**
@@ -201,6 +205,7 @@ public class HomeworkResource {
         else {return null;}
     }
     @GetMapping("/homework/select")
+    @PreAuthorize("hasRole(\"ROLE_ADMIN\")")
     Object findHomeworkByKey(@RequestParam("keyword") String keyword ,@RequestParam("className") String className)
     {
         List<Homework> homeworkList=homeworkService.findByKeywordAndClassName(keyword,className);
@@ -217,9 +222,20 @@ public class HomeworkResource {
                 checkMap.put(homeworkList.get(i).getOwner(),"是");
             }
         }
-        return ResponseEntity.ok().body(checkMap);
+        List<HomeworkCheck> homeworkCheckList=new ArrayList<>();
+        Iterator<String> value = checkMap.keySet().iterator();
+        while(value.hasNext())
+        {
+            String key=value.next();
+            HomeworkCheck homeworkCheck=new HomeworkCheck();
+            homeworkCheck.setOwner(key);
+            homeworkCheck.setIscomplete(checkMap.get(key));
+            homeworkCheckList.add(homeworkCheck);
+        }
+        return ResponseEntity.ok().body(homeworkCheckList);
     }
     @GetMapping("/homework/downloadzip")
+    @PreAuthorize("hasRole(\"ROLE_ADMIN\")")
     Object downloadzip(@RequestParam("keyword") String keyword ,@RequestParam("className") String className) throws Exception
     {
         List<Homework> homeworkList=homeworkService.findByKeywordAndClassName(keyword,className);

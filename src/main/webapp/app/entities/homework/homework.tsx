@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, InputGroup, Col, Row, Table } from 'reactstrap';
-import {Icon} from 'antd'
+import { Button, InputGroup, Table } from 'reactstrap';
+import {Icon, Upload} from 'antd'
 import {
   Translate,
   TextFormat,
@@ -10,7 +10,8 @@ import {
 
 } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import {message,Row,Col} from "antd";
+import 'antd/dist/antd.css';
 import { IRootState } from 'app/shared/reducers';
 import { getSearchEntities, getEntities } from './homework.reducer';
 import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
@@ -52,15 +53,55 @@ export class Homework extends React.Component<IHomeworkProps>{
     })
     
   }
+ handledownload=(homework)=>
+ {
+  Axios.get(`/api/homework/download?fileName=${homework.fileName}&owner=${homework.owner}&className=${homework.className}`,{responseType: 'blob'}).then(blob => {
+    const aLink = document.createElement('a');
+    document.body.appendChild(aLink);
+    aLink.style.display='none';
+    const objectUrl = window.URL.createObjectURL(blob.data);
+    aLink.href = objectUrl;
+    aLink.download = homework.fileName;
+    aLink.click();
+    document.body.removeChild(aLink);
+  });
+ }
+ handledelete=(homework)=>
+ {
+  Axios.delete(`/api/homework`,{params:{fileName:homework.fileName,owner:homework.owner,className:homework.className}}).then(response=>{
+    if(response.status===200)
+    {
+       message.success("删除文件成功！");
+     this.setState({homeworkList:this.state.homeworkList.filter(r=>r.fileName!==homework.fileName)});
+    }
+});
+ }
+
+ handleupload=(file)=>{
+  if(file.file.status==="done")
+  {
+    Axios.get(`/api/homework/student/${this.state.userInfo.login}`)
+    .then(res=>{
+      this.setState({homeworkList:res.data})
+    })
+  }
+}
+ 
  
   render() {
-   const {homeworkList}=this.state;
+   const {homeworkList,userInfo}=this.state;
    const {match}=this.props;
+   const className=userInfo===null?"":userInfo.className;
+   const owner=userInfo===null?"":userInfo.login;
     return (
       
       <div>
         <h2 id="homework-heading">
+          <Row>
+            <Col span={21}>
           <Translate contentKey="teachermanagerApp.homework.home.title">Homework</Translate>
+          </Col>
+          <Col span={3}>
           {
           this.state.isadmin?
       
@@ -68,9 +109,10 @@ export class Homework extends React.Component<IHomeworkProps>{
             查看作业完成情况
           </Link>
           :
-          <Button  className="btn btn-primary float-right jh-create-entity">上传作业</Button>
+          <Upload action= "/api/homework" method="put" data={{className,owner}} onChange={this.handleupload}  headers={{Authorization:`Bearer ${sessionStorage.getItem("jhi-authenticationToken").replace("\"","")}`}}><Button>上传作业</Button></Upload>
           }
-
+          </Col>
+          </Row>
         </h2>
         
         <div className="table-responsive">
@@ -112,14 +154,14 @@ export class Homework extends React.Component<IHomeworkProps>{
                     </td>
                     <td className="text-right">
                       <div className="btn-group flex-btn-group-container">
-                        <Button tag={Link} to={`${match.url}/${homework.id}`} color="info" size="sm">
+                        <Button onClick={this.handledownload.bind(this,homework)} color="info" size="sm">
                           <Icon type="download" style={{fontSize:18}}/>{' '}
                           <span className="d-none d-md-inline">
                            下载
                           </span>
 
                         </Button>
-                        <Button tag={Link} to={`${match.url}/${homework.id}/delete`} color="danger" size="sm">
+                        <Button onClick={this.handledelete.bind(this,homework)} color="danger" size="sm">
                           <FontAwesomeIcon icon="trash" />{' '}
                           <span className="d-none d-md-inline">
                             <Translate contentKey="entity.action.delete">Delete</Translate>
