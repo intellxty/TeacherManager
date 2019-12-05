@@ -20,7 +20,8 @@
       "fileName": "File Name",
       "owner": "Owner",
       "className": "Class Name",
-      "editTime": "Edit Time"
+      "editTime": "Edit Time",
+      "operation":"operation"
     }
   }
 }

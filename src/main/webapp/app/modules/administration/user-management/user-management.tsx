@@ -42,47 +42,31 @@ export const UserManagement = (props: IUserManagementProps) => {
       activePage: currentPage
     });
 
-  const toggleActive = user => () =>
-    props.updateUser({
-      ...user,
-      activated: !user.activated
-    });
+ 
 
   const { users, account, match, totalItems } = props;
   return (
     <div>
       <h2 id="user-management-page-heading">
         <Translate contentKey="userManagement.home.title">Users</Translate>
-        <Link to={`${match.url}/new/new1`} className="btn btn-primary float-right jh-create-entity">
-          <FontAwesomeIcon icon="plus" /> <Translate contentKey="userManagement.home.createLabel">Create a new user</Translate>
-        </Link>
+      
         <Link to={`${match.url}/new/addDataFromFile`} className="btn btn-primary float-right jh-create-entity">
           <FontAwesomeIcon icon="plus" /> 批量导入用户
         </Link>
-        <Link to={`${match.url}/new/deleteAllUser`} className="btn btn-primary float-right jh-create-entity">
+        <Link to={`${match.url}/new/deleteAllUser`} className="btn btn-primary float-right jh-create-entity" 
+        style={{marginRight:10}}>
           <FontAwesomeIcon icon="plus" /> 清空所有非管理员用户
         </Link>
       </h2>
       <Table responsive striped>
         <thead>
           <tr>
-            <th className="hand" onClick={sort('id')}>
-              <Translate contentKey="global.field.id">ID</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
+            
             <th className="hand" onClick={sort('login')}>
               <Translate contentKey="userManagement.login">Login</Translate>
               <FontAwesomeIcon icon="sort" />
             </th>
-            <th className="hand" onClick={sort('email')}>
-              <Translate contentKey="userManagement.email">Email</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th />
-            <th className="hand" onClick={sort('langKey')}>
-              <Translate contentKey="userManagement.langKey">Lang Key</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
+          
             <th>
               <Translate contentKey="userManagement.profiles">Profiles</Translate>
             </th>
@@ -90,39 +74,19 @@ export const UserManagement = (props: IUserManagementProps) => {
               <Translate contentKey="userManagement.createdDate">Created Date</Translate>
               <FontAwesomeIcon icon="sort" />
             </th>
-            <th className="hand" onClick={sort('lastModifiedBy')}>
-              <Translate contentKey="userManagement.lastModifiedBy">Last Modified By</Translate>
-              <FontAwesomeIcon icon="sort" />
+          
+            <th className="hand" >
+              <Translate contentKey="userManagement.operation">Created Date</Translate>
             </th>
-            <th id="modified-date-sort" className="hand" onClick={sort('lastModifiedDate')}>
-              <Translate contentKey="userManagement.lastModifiedDate">Last Modified Date</Translate>
-              <FontAwesomeIcon icon="sort" />
-            </th>
-            <th />
+           
           </tr>
         </thead>
         <tbody>
           {users.map((user, i) => (
             <tr id={user.login} key={`user-${i}`}>
-              <td>
-                <Button tag={Link} to={`${match.url}/${user.login}`} color="link" size="sm">
-                  {user.id}
-                </Button>
-              </td>
+              
               <td>{user.login}</td>
-              <td>{user.email}</td>
-              <td>
-                {user.activated ? (
-                  <Button color="success" onClick={toggleActive(user)}>
-                    Activated
-                  </Button>
-                ) : (
-                  <Button color="danger" onClick={toggleActive(user)}>
-                    Deactivated
-                  </Button>
-                )}
-              </td>
-              <td>{user.langKey}</td>
+             
               <td>
                 {user.authorities
                   ? user.authorities.map((authority, j) => (
@@ -135,11 +99,8 @@ export const UserManagement = (props: IUserManagementProps) => {
               <td>
                 <TextFormat value={user.createdDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid />
               </td>
-              <td>{user.lastModifiedBy}</td>
-              <td>
-                <TextFormat value={user.lastModifiedDate} type="date" format={APP_DATE_FORMAT} blankOnInvalid />
-              </td>
-              <td className="text-right">
+             
+              <td >
                 <div className="btn-group flex-btn-group-container">
                   <Button tag={Link} to={`${match.url}/${user.login}`} color="info" size="sm">
                     <FontAwesomeIcon icon="eye" />{' '}

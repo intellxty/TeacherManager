@@ -1,19 +1,24 @@
 {
   "home": {
-    "title": "欢迎, Java Hipster!",
+    "title": "欢迎来到作业管理系统",
     "subtitle": "这里是首页",
     "logged": {
-      "message": "您目前是以 \"{{username}}\" 账号登录."
+      "message": "您目前是以 \"{{username}}\" 账号登录.",
+      "guide1":"右上角的菜单栏的\"数据\"选项有作业管理模块、公共文件模块",
+      "guide2":"右上角的菜单栏的\"账号\"选项你设置管理账号信息、也可以退出登陆",
+      "guide3":"右上角的菜单栏的\"管理\"选项只有管理员才能看见，如果你是管理员，可以批量管理学生信息"
     },
     "question": "如果您有任何有关 JHipster 的问题, 可以查阅下列资源:",
-    "link": {
-      "homepage": "JHipster 首頁",
-      "stackoverflow": "Stack Overflow 上关于 JHipster 的讨论",
-      "bugtracker": "JHipster 的缺陷追踪",
-      "chat": "JHipster public chat room",
-      "follow": "在 Twitter 上联络 @jhipster"
+    "teacher": {
+      "importingStudents": " 批量导入学生信息，提供解析XLS，CSV格式数据功能，并将现有学生名单打印到页面上",
+      "workManagement": "作业管理模块，提供作业总表展示功能、 提供作业筛选功能、提供作业打包下载功能、提供作业完成情况比对功能等",
+      "publicdocuments": " 公用文件模块，提供公共文件总表展示功能、提供公共文件上传功能、提供公共文件下载功能、提供公共文件删除功能"
     },
-    "like": "如果您喜欢 JHipster, 请记得给我们加星在",
+    "student":{
+      "workUse": "作业管理模块，你可以上传作业、你可以查看作业文件夹内容、可以下载已上传的作业、你可以删除已上传的作业",
+      "publicdocuments": " 公共文件模块，你可以查看公共文件总表展示，你可以下载公共文件"
+    },
+    "like": "点击右上角的\"账号\"选项去登陆",
     "github": "GitHub"
   }
 }

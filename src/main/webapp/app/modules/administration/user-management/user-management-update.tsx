@@ -56,14 +56,7 @@ export const UserManagementUpdate = (props: IUserManagementUpdateProps) => {
             <p>Loading...</p>
           ) : (
             <AvForm onValidSubmit={saveUser}>
-              {user.id ? (
-                <AvGroup>
-                  <Label for="id">
-                    <Translate contentKey="global.field.id">ID</Translate>
-                  </Label>
-                  <AvField type="text" className="form-control" name="id" required readOnly value={user.id} />
-                </AvGroup>
-              ) : null}
+           
               <AvGroup>
                 <Label for="login">
                   <Translate contentKey="userManagement.login">Login</Translate>
@@ -93,85 +86,7 @@ export const UserManagementUpdate = (props: IUserManagementUpdateProps) => {
                   value={user.login}
                 />
               </AvGroup>
-              <AvGroup>
-                <Label for="firstName">
-                  <Translate contentKey="userManagement.firstName">First Name</Translate>
-                </Label>
-                <AvField
-                  type="text"
-                  className="form-control"
-                  name="firstName"
-                  validate={{
-                    maxLength: {
-                      value: 50,
-                      errorMessage: translate('entity.validation.maxlength', { max: 50 })
-                    }
-                  }}
-                  value={user.firstName}
-                />
-              </AvGroup>
-              <AvGroup>
-                <Label for="lastName">
-                  <Translate contentKey="userManagement.lastName">Last Name</Translate>
-                </Label>
-                <AvField
-                  type="text"
-                  className="form-control"
-                  name="lastName"
-                  validate={{
-                    maxLength: {
-                      value: 50,
-                      errorMessage: translate('entity.validation.maxlength', { max: 50 })
-                    }
-                  }}
-                  value={user.lastName}
-                />
-                <AvFeedback>This field cannot be longer than 50 characters.</AvFeedback>
-              </AvGroup>
-              <AvGroup>
-                <AvField
-                  name="email"
-                  label={translate('global.form.email.label')}
-                  placeholder={translate('global.form.email.placeholder')}
-                  type="email"
-                  validate={{
-                    required: {
-                      value: true,
-                      errorMessage: translate('global.messages.validate.email.required')
-                    },
-                    email: {
-                      errorMessage: translate('global.messages.validate.email.invalid')
-                    },
-                    minLength: {
-                      value: 5,
-                      errorMessage: translate('global.messages.validate.email.minlength')
-                    },
-                    maxLength: {
-                      value: 254,
-                      errorMessage: translate('global.messages.validate.email.maxlength')
-                    }
-                  }}
-                  value={user.email}
-                />
-              </AvGroup>
-              <AvGroup check>
-                <Label>
-                  <AvInput type="checkbox" name="activated" value={user.activated} />{' '}
-                  <Translate contentKey="userManagement.activated">Activated</Translate>
-                </Label>
-              </AvGroup>
-              <AvGroup>
-                <Label for="langKey">
-                  <Translate contentKey="userManagement.langKey">Language Key</Translate>
-                </Label>
-                <AvField type="select" className="form-control" name="langKey" value={user.langKey}>
-                  {locales.map(locale => (
-                    <option value={locale} key={locale}>
-                      {languages[locale].name}
-                    </option>
-                  ))}
-                </AvField>
-              </AvGroup>
+            
               <AvGroup>
                 <Label for="authorities">
                   <Translate contentKey="userManagement.profiles">Language Key</Translate>
