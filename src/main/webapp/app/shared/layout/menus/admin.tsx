@@ -11,25 +11,6 @@ const adminMenuItems = (
     <MenuItem icon="user" to="/admin/user-management">
       <Translate contentKey="global.menu.admin.userManagement">User management</Translate>
     </MenuItem>
-    <MenuItem icon="eye" to="/admin/tracker">
-      <Translate contentKey="global.menu.admin.tracker">User tracker</Translate>
-    </MenuItem>
-    <MenuItem icon="tachometer-alt" to="/admin/metrics">
-      <Translate contentKey="global.menu.admin.metrics">Metrics</Translate>
-    </MenuItem>
-    <MenuItem icon="heart" to="/admin/health">
-      <Translate contentKey="global.menu.admin.health">Health</Translate>
-    </MenuItem>
-    <MenuItem icon="list" to="/admin/configuration">
-      <Translate contentKey="global.menu.admin.configuration">Configuration</Translate>
-    </MenuItem>
-    <MenuItem icon="bell" to="/admin/audits">
-      <Translate contentKey="global.menu.admin.audits">Audits</Translate>
-    </MenuItem>
-    {/* jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here */}
-    <MenuItem icon="tasks" to="/admin/logs">
-      <Translate contentKey="global.menu.admin.logs">Logs</Translate>
-    </MenuItem>
   </>
 );
 
@@ -42,7 +23,6 @@ const swaggerItem = (
 export const AdminMenu = ({ showSwagger }) => (
   <NavDropdown icon="user-plus" name={translate('global.menu.admin.main')} style={{ width: '140%' }} id="admin-menu">
     {adminMenuItems}
-    {showSwagger && swaggerItem}
   </NavDropdown>
 );
 
